@@ -32,10 +32,12 @@ dependencies:
     sdk: flutter
   google_sign_in: ^6.1.5
   http: ^0.13.5
+  font_awesome_flutter: ^10.7.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
+  flutter_svg: ^2.0.9
 
 dev_dependencies:
   flutter_test:
@@ -53,6 +55,12 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+
+  assets:
+    - assets/logo_universidad_blanco.png
+    - assets/logo_universidad_negro.svg
+    - assets/google_logo.png
+    - assets/fondo_app.jpg
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
