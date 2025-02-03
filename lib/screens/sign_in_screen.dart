@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../services/auth_service.dart';
-import 'home_screen.dart';
+import '../models/user_model.dart';
+import 'profile_screen.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_styles.dart';
 import '../theme/app_buttons.dart';
@@ -53,7 +54,7 @@ class _SignInScreenState extends State<SignInScreen> {
     });
   }
 
-  void _validateInstitutionalEmail(GoogleSignInAccount account) {
+  void _validateInstitutionalEmail(GoogleSignInAccount account) async {
     if (!account.email.endsWith("@continental.edu.pe")) {
       setState(() {
         _errorMessage = "Debes iniciar sesión con tu correo institucional.";
@@ -65,7 +66,17 @@ class _SignInScreenState extends State<SignInScreen> {
         _currentUser = account;
         _errorMessage = null;
       });
-      AuthService.sendTokenToBackend(account);
+      
+      // Enviar token a backend y obtener datos del usuario
+      UserModel? user = await AuthService.sendTokenToBackend(account);
+      if (user != null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProfileScreen(user: user, isFirstLogin: true),
+          ),
+        );
+      }
     }
   }
 
@@ -87,7 +98,7 @@ class _SignInScreenState extends State<SignInScreen> {
           Center(
             child: Container(
               width: MediaQuery.of(context).size.width * 0.9,
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(30),
               decoration: BoxDecoration(
                 color: AppColors.primaryBackground.withOpacity(0.80),
                 borderRadius: BorderRadius.circular(12),
@@ -95,14 +106,13 @@ class _SignInScreenState extends State<SignInScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Image.asset('assets/logo_universidad_blanco.png', height: 75),
+                  Image.asset('assets/logo_universidad_blanco.png', height: 68),
                   const SizedBox(height: 15),
                   const Text("¡Estamos ContiGO!", style: AppStyles.titleStyle),
                   const SizedBox(height: 10),
                   const Text("Inicia sesión con tu correo institucional", style: AppStyles.subtitleStyle),
                   const SizedBox(height: 30),
 
-                  // Si el usuario está autenticado, mostramos su nombre y los botones
                   if (_currentUser != null) ...[
                     Text(
                       "Bienvenido, ${_currentUser!.displayName}",
@@ -110,8 +120,6 @@ class _SignInScreenState extends State<SignInScreen> {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 20),
-
-                    // Botón para ir a la Home
                     SizedBox(
                       width: MediaQuery.of(context).size.width * 0.8,
                       height: 45,
@@ -122,38 +130,14 @@ class _SignInScreenState extends State<SignInScreen> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (context) => HomeScreen()),
-                          );
-                        },
-                        child: Text("Ir a la Home", style: AppStyles.buttonTextStyle),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-
-                    // Botón para cerrar sesión
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.8,
-                      height: 45,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red.shade100,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
                         onPressed: _handleSignOut,
                         child: Text("Cerrar sesión", style: AppStyles.buttonTextStyle),
                       ),
                     ),
                   ] else ...[
-                    // Si el usuario no ha iniciado sesión, mostramos el botón de Google
                     GoogleSignInButton(onPressed: _handleSignIn),
                   ],
 
-                  // Mostrar mensaje de error si hay
                   if (_errorMessage != null) ...[
                     const SizedBox(height: 20),
                     ErrorMessage(message: _errorMessage!),

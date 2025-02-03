@@ -9,4 +9,6 @@ class AppColors {
   static const Color textSubtitle = Color(0xFFB8A1D9);
   static const Color buttonBackground = Colors.white;
   static const Color buttonText = Colors.black;
+  static const Color primaryColor = Color(0xFF7C19E0);
+  static const Color secondaryBackground = Color(0xFF7C19E0);
 }
